@@ -53,3 +53,5 @@ CREATE TABLE IF NOT EXISTS Exercises (
     reps INTEGER,
     equipment TEXT
 );
+
+
