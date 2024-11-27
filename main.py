@@ -8,6 +8,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from typing import List
 from datetime import datetime
+from algorithms import save_workout_plan_to_excel
+from fastapi.responses import FileResponse
+import os
+
 
 app = FastAPI()
 
@@ -24,6 +28,42 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.post("/export_workout_plan/{user_id}")
+def export_workout_plan(user_id: int, days: int, db: Session = Depends(get_db)):
+    # Fetch the user
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Generate the workout plan
+    workout_plan = generate_workout_plan(user_id, days, db)
+
+    # Define filename
+    filename = f"workout_plan_user_{user_id}.xlsx"
+
+    # Save the workout plan to an Excel file
+    save_workout_plan_to_excel(workout_plan, filename)
+
+    # Ensure the file is properly deleted after being served
+    response = FileResponse(filename, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=filename)
+    os.remove(filename)  # Delete the file after response
+    return response
+
+
+
+'''
+
+BELOW IS SAME
+
+
+'''
+
+
+
+
+
+
 
 
 

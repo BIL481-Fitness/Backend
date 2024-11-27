@@ -4,6 +4,40 @@ from sqlalchemy.orm import Session
 from models import Exercise, User
 from datetime import datetime
 from models import UserFitnessData
+import pandas as pd
+
+
+
+def save_workout_plan_to_excel(workout_plan, filename="workout_plan.xlsx"):
+    """
+    Exports the workout plan to an Excel file.
+
+    Args:
+    - workout_plan (dict): The workout plan dictionary, with days as keys and plans as values.
+    - filename (str): Name of the Excel file to save the plan.
+    """
+    with pd.ExcelWriter(filename) as writer:
+        for day, exercises in workout_plan.items():
+            if exercises:  # If there are exercises for the day
+                # Ensure the DataFrame columns align with the workout plan structure
+                df = pd.DataFrame(exercises, columns=["bolge", "hareket_adi", "set_sayisi", "tekrar_sayisi", "ekipman"])
+                df.to_excel(writer, sheet_name=day, index=False)
+            else:  # Handle rest day or no exercises
+                pd.DataFrame([{"Message": "Rest Day"}]).to_excel(writer, sheet_name=day, index=False)
+
+
+
+'''
+
+BELOW IS SAME
+
+'''
+
+
+
+
+
+
 
 def generate_workout_plan(user_id: int, days: int, db: Session) -> Dict[str, List[Dict[str, str]]]:
     """
