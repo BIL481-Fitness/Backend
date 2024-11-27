@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from models import Base, User, WorkoutPlan, UserFitnessData, WorkoutPlanResponse, UserFitnessDataResponse, UpdateUserData
+from models import Base, User, WorkoutPlan, UserFitnessData, WorkoutPlanResponse, UserFitnessDataResponse, UpdateUserData, LoginRequest, Coach, StudentResponse
 from algorithms import generate_workout_plan
 from pydantic import BaseModel
 from datetime import date
@@ -161,3 +161,35 @@ def get_workout_plans(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Workout plans not found")
     
     return workout_plans
+
+
+@app.post("/login")
+def login(credentials: LoginRequest, db: Session = Depends(get_db)):
+    # Önce Users tablosunda kontrol edelim
+    user = db.query(User).filter(User.name == credentials.name, User.password == credentials.password).first()
+    if user:
+        return {"id": user.id, "role": "user"}  # Kullanıcı bulundu
+
+    # Eğer Users tablosunda bulunmazsa Coaches tablosunda arayalım
+    coach = db.query(Coach).filter(Coach.name == credentials.name, Coach.password == credentials.password).first()
+    if coach:
+        return {"id": coach.id, "role": "coach"}  # Koç bulundu
+
+    # Her iki tabloda da eşleşme yoksa hata döndürelim
+    raise HTTPException(status_code=401, detail="Invalid username or password")
+
+@app.get("/coach/{coach_id}/students", response_model=List[StudentResponse])
+def get_students_by_coach(coach_id: int, db: Session = Depends(get_db)):
+    # Koçu kontrol et
+    coach = db.query(Coach).filter(Coach.id == coach_id).first()
+    if not coach:
+        raise HTTPException(status_code=404, detail="Coach not found")
+
+    # Koça bağlı tüm öğrencileri getir
+    students = db.query(User).filter(User.coach_id == coach_id).all()
+
+    # Eğer öğrenci bulunmazsa boş liste dönebiliriz
+    if not students:
+        return []
+
+    return students

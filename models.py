@@ -92,3 +92,18 @@ class UpdateUserData(BaseModel):
     weight: float
     height: float
     days: int = None  # Bu parametre isteğe bağlıdır; workout planı oluşturulacaksa sağlanmalıdır
+
+class LoginRequest(BaseModel):
+    name: str
+    password: str
+
+class StudentResponse(BaseModel):
+    id: int
+    name: str
+    age: int
+    weight: float
+    height: float
+    fitness_level: int
+    bmi: float
+    daily_calories: int
+    goal: str
