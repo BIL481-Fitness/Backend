@@ -109,3 +109,19 @@ class StudentResponse(BaseModel):
     bmi: float
     daily_calories: int
     goal: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    age: int
+    weight: float
+    height: float
+    fitness_level: int
+    bmi: float
+    daily_calories: int
+    goal: str
+    coach_id: int
+
+    class Config:
+        orm_mode = True

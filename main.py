@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from models import Base, User, WorkoutPlan, UserFitnessData, WorkoutPlanResponse, UserFitnessDataResponse, UpdateUserData, LoginRequest, Coach, StudentResponse
+from models import Base, User, WorkoutPlan, UserFitnessData, WorkoutPlanResponse, UserFitnessDataResponse, UpdateUserData, LoginRequest, Coach, StudentResponse, UserResponse
 from algorithms import generate_workout_plan
 from pydantic import BaseModel
 from datetime import date
@@ -193,3 +193,11 @@ def get_students_by_coach(coach_id: int, db: Session = Depends(get_db)):
         return []
 
     return students
+
+@app.get("/user_info/{user_id}", response_model=UserResponse)
+def get_user_info(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
