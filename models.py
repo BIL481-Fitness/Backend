@@ -16,6 +16,7 @@ class Coach(Base):
     weight = Column(Float)
     height = Column(Float)
     experience_level = Column(Integer)
+    password = Column(String, nullable=False)
 
 class User(Base):
     __tablename__ = 'Users'
@@ -30,6 +31,7 @@ class User(Base):
     coach_id = Column(Integer, ForeignKey('Coaches.id'))
     daily_calories = Column(Integer)
     goal = Column(String)
+    password = Column(String, nullable=False) 
     
     coach = relationship('Coach', backref='users')
 

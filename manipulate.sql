@@ -1,1 +1,1 @@
-SELECT * FROM Coaches;
+SELECT * FROM Users;
