@@ -64,7 +64,7 @@ class Exercise(Base):
     exercise_name = Column(String, nullable=False)
     body_part = Column(String)
     sets = Column(Integer)
-    reps = Column(String)
+    reps = Column(Integer)
     equipment = Column(String)
 
 
