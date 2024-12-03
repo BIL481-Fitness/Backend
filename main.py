@@ -106,7 +106,7 @@ def generate_workout_plan_for_user(user_id: int, user_data: UpdateUserData, db: 
         for exercise in exercises:
             new_fitness_data = UserFitnessData(
                 user_id=user.id,
-                date=datetime.date.today(),  # Bugünün tarihi ile kaydediyoruz
+                date=datetime.today(),
                 exercise_name=exercise["hareket_adi"],
                 weight=0,  # Başlangıçta ağırlık verisi yoksa 0 olarak kaydedebiliriz
                 sets=exercise["set_sayisi"],
