@@ -58,11 +58,11 @@ This project contains a SQLite database designed for managing fitness-related da
 
 **Sample Data:**
 ```plaintext
-(1, 'Ayse Guler', 37, 87.38, 153.42, 'Intermediate', 37.12, 5, 2500, 'Muscle Gain', 1234)
-(2, 'Emre Ozturk', 55, 63.72, 176.64, 'Intermediate', 20.42, 1, 2200, 'Endurance', 1234)
-(3, 'Ayse Aydin', 23, 64.57, 163.07, 'Beginner', 24.28, 1, 2300, 'Weight Loss', 1234)
-(4, 'Cem Celik', 56, 96.88, 173.53, 'Beginner', 32.17, 5, 2400, 'Weight Loss', 1234)
-(5, 'Oguz Arslan', 25, 83.85, 160.47, 'Intermediate', 32.56, 5, 2100, 'Weight Loss', 1234)
+(1, 'Ayse Guler', 37, 87.38, 153.42, '2', 37.12, 5, 2500, 'Muscle Gain', 1234)
+(2, 'Emre Ozturk', 55, 63.72, 176.64, '2', 20.42, 1, 2200, 'Endurance', 1234)
+(3, 'Ayse Aydin', 23, 64.57, 163.07, '1', 24.28, 1, 2300, 'Weight Loss', 1234)
+(4, 'Cem Celik', 56, 96.88, 173.53, '1', 32.17, 5, 2400, 'Weight Loss', 1234)
+(5, 'Oguz Arslan', 25, 83.85, 160.47, '2', 32.56, 5, 2100, 'Weight Loss', 1234)
 ```
 
 ---
