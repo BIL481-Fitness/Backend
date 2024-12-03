@@ -73,7 +73,7 @@ class ExerciseResponse(BaseModel):
     bolge: str  # Kas grubu
     hareket_adi: str  # Egzersiz adı
     set_sayisi: int  # Set sayısı
-    tekrar_sayisi: str  # Tekrar sayısı
+    tekrar_sayisi: int  # Tekrar sayısı
     ekipman: str  # Kullanılacak ekipman
 
 class WorkoutPlanResponse(BaseModel):
