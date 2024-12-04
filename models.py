@@ -125,3 +125,19 @@ class UserResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class CoachResponse(BaseModel):
+    id: int
+    name: str
+    specialization: str
+    age: int
+    weight: float
+    height: float
+    experience_level: int
+
+    class Config:
+        orm_mode = True
+
+class CoachSelectionRequest(BaseModel):
+    user_id: int
+    coach_id: int

@@ -1,6 +1,19 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from models import Base, User, WorkoutPlan, UserFitnessData, WorkoutPlanResponse, UserFitnessDataResponse, UpdateUserData, LoginRequest, Coach, StudentResponse, UserResponse
+from models import (
+    Base, 
+    User, 
+    WorkoutPlan, 
+    UserFitnessData, 
+    WorkoutPlanResponse, 
+    UserFitnessDataResponse, 
+    UpdateUserData, 
+    LoginRequest, 
+    Coach, 
+    StudentResponse, 
+    UserResponse,
+    CoachResponse,
+    CoachSelectionRequest)
 from algorithms import generate_workout_plan
 from pydantic import BaseModel
 from datetime import date
@@ -201,3 +214,23 @@ def get_user_info(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     
     return user
+
+@app.get("/coaches", response_model=List[CoachResponse])
+def get_all_coaches(db: Session = Depends(get_db)):
+    coaches = db.query(Coach).all()
+    return coaches
+
+
+@app.post("/select_coach")
+def select_coach(request: CoachSelectionRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == request.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    coach = db.query(Coach).filter(Coach.id == request.coach_id).first()
+    if not coach:
+        raise HTTPException(status_code=404, detail="Coach not found")
+    
+    user.coach_id = request.coach_id
+    db.commit()
+    return {"message": "Coach selected successfully"}
