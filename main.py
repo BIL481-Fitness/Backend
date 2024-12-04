@@ -42,7 +42,7 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/export_workout_plan/{user_id}")
+@app.get("/export_workout_plan/{user_id}")
 def export_workout_plan(user_id: int, days: int, db: Session = Depends(get_db)):
     # Fetch the user
     user = db.query(User).filter(User.id == user_id).first()
