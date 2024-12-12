@@ -41,12 +41,12 @@ def get_db():
         yield db
     finally:
         db.close()
-        
+
 def remove_file(filename: str):
     os.remove(filename)
 
 @app.get("/export_workout_plan/{user_id}")
-def export_workout_plan(user_id: int, db: Session = Depends(get_db)):
+def export_workout_plan(user_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     # Fetch the user
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -67,12 +67,9 @@ def export_workout_plan(user_id: int, db: Session = Depends(get_db)):
     save_workout_plan_to_excel(workout_plan, filename)
 
     # Ensure the file is properly deleted after being served
-    response = FileResponse(filename, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=filename)
-    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
-    
-    BackgroundTasks.add_task(remove_file, filename)
+    background_tasks.add_task(remove_file, filename)
 
-    return response
+    return FileResponse(filename, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=filename)
 
 
 
