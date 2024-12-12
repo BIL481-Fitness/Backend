@@ -45,13 +45,13 @@ def generate_workout_plan(user_id: int, days: int, db: Session) -> Dict[str, Lis
         raise ValueError("Kullanıcı bulunamadı.")
     
     # Kullanıcı özelliklerine göre yoğunluk ayarları
-    bmi = user.bmi
-    exercise_intensity = (
-        'low' if bmi < 18.5 else
-        'medium' if bmi < 24.9 else
-        'high' if bmi < 29.9 else
-        'very high'
-    )
+    # bmi = user.bmi
+    # exercise_intensity = (
+    #     'low' if bmi < 18.5 else
+    #     'medium' if bmi < 24.9 else
+    #     'high' if bmi < 29.9 else
+    #     'very high'
+    # )
     
     # Egzersiz verilerini al
     exercises = db.query(Exercise).all()
