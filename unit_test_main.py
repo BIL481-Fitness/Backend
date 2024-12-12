@@ -3,6 +3,8 @@ from main import app
 import json
 
 client = TestClient(app)
+
+
 '''
 GENERATE WORKOUT
 '''
@@ -14,6 +16,7 @@ def test_generate_workout_plan_for_existing_user():
         "days": 7
     }
     response = client.post("/generate_workout_plan/1", json=user_data)
+    print(response.json())
     assert response.status_code == 200
     assert len(response.json()) == 7  # 7 günlük plan bekleniyor
 

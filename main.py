@@ -101,6 +101,7 @@ def generate_workout_plan_for_user(user_id: int, user_data: UpdateUserData, db: 
         db.delete(existing_workout_plan)
         db.commit()
     
+    print(user_data.age)
     # Kullanıcıyı veritabanında güncellenmiş verilerle güncelliyoruz
     user.age = user_data.age
     user.weight = user_data.weight

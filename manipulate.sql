@@ -1,4 +1,4 @@
-SELECT * FROM Coaches;
+SELECT * FROM Users;
 
-UPDATE Coaches SET weight = REPLACE(weight, ',', '.');
-UPDATE Coaches SET height = REPLACE(height, ',', '.');
+UPDATE Users SET bmi = REPLACE(bmi, ',', '.');
+UPDATE Users SET height = REPLACE(height, ',', '.');
