@@ -23,7 +23,7 @@ from typing import List
 from datetime import datetime
 from algorithms import save_workout_plan_to_excel
 from fastapi.responses import FileResponse
-import os
+import os, json
 
 
 app = FastAPI()
@@ -43,15 +43,17 @@ def get_db():
         db.close()
 
 @app.get("/export_workout_plan/{user_id}")
-def export_workout_plan(user_id: int, days: int, db: Session = Depends(get_db)):
+def export_workout_plan(user_id: int, db: Session = Depends(get_db)):
     # Fetch the user
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Generate the workout plan
-    workout_plan = generate_workout_plan(user_id, days, db)
-
+    workout_plan_record = db.query(WorkoutPlan).filter(WorkoutPlan.user_id == user_id).first()
+    if not workout_plan_record:
+        raise HTTPException(status_code=404, detail="Workout plan not found")
+    
+    workout_plan = json.loads(workout_plan_record.workout_data)
     # Define filename
     filename = f"workout_plan_user_{user_id}.xlsx"
 
