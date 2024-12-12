@@ -1,25 +1,11 @@
 from fastapi.testclient import TestClient
 from main import app
+import json
 
 client = TestClient(app)
-
-'''
-EXPORT WORKOUT PLAN
-'''
-def test_export_workout_plan_success():
-    response = client.post("/export_workout_plan/1?days=7")
-    assert response.status_code == 200
-    assert response.headers["content-type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-
-def test_export_workout_plan_with_invalid_user():
-    response = client.post("/export_workout_plan/999?days=7")
-    assert response.status_code == 404
-    assert response.json() == {"detail": "User not found"}
-
 '''
 GENERATE WORKOUT
 '''
-
 def test_generate_workout_plan_for_existing_user():
     user_data = {
         "age": 25,
@@ -41,6 +27,22 @@ def test_generate_workout_plan_for_nonexistent_user():
     response = client.post("/generate_workout_plan/999", json=user_data)
     assert response.status_code == 404
     assert response.json() == {"detail": "User not found"}
+
+
+'''
+EXPORT WORKOUT PLAN
+'''
+def test_export_workout_plan_success():
+    response = client.get("/export_workout_plan/1")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+def test_export_workout_plan_with_invalid_user():
+    response = client.get("/export_workout_plan/999")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "User not found"}
+
+
 
 '''
 UPDATE USER DATA

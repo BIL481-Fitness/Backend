@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from models import (
     Base, 
@@ -41,6 +41,9 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+def remove_file(filename: str):
+    os.remove(filename)
 
 @app.get("/export_workout_plan/{user_id}")
 def export_workout_plan(user_id: int, db: Session = Depends(get_db)):
@@ -49,11 +52,14 @@ def export_workout_plan(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    # Fetch the workout plan
     workout_plan_record = db.query(WorkoutPlan).filter(WorkoutPlan.user_id == user_id).first()
     if not workout_plan_record:
         raise HTTPException(status_code=404, detail="Workout plan not found")
-    
+
+    # Parse the workout data
     workout_plan = json.loads(workout_plan_record.workout_data)
+
     # Define filename
     filename = f"workout_plan_user_{user_id}.xlsx"
 
@@ -62,7 +68,10 @@ def export_workout_plan(user_id: int, db: Session = Depends(get_db)):
 
     # Ensure the file is properly deleted after being served
     response = FileResponse(filename, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=filename)
-    os.remove(filename)  # Delete the file after response
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    
+    BackgroundTasks.add_task(remove_file, filename)
+
     return response
 
 
@@ -89,6 +98,12 @@ def generate_workout_plan_for_user(user_id: int, user_data: UpdateUserData, db: 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Delete any existing workout plan for the user
+    existing_workout_plan = db.query(WorkoutPlan).filter(WorkoutPlan.user_id == user_id).first()
+    if existing_workout_plan:
+        db.delete(existing_workout_plan)
+        db.commit()
+    
     # Kullanıcıyı veritabanında güncellenmiş verilerle güncelliyoruz
     user.age = user_data.age
     user.weight = user_data.weight
@@ -97,7 +112,6 @@ def generate_workout_plan_for_user(user_id: int, user_data: UpdateUserData, db: 
 
     # Workout planını oluşturuyoruz
     workout_plan = generate_workout_plan(user_id, user_data.days, db)  # 7 gün için plan oluşturuyoruz
-    
 
     # Workout planını dönüştürerek response modeline uygun hale getiriyoruz
     workout_plan_response = []
@@ -106,11 +120,11 @@ def generate_workout_plan_for_user(user_id: int, user_data: UpdateUserData, db: 
             "day": day,
             "exercises": [
                 {
-                    "bolge": exercise["bolge"],
-                    "hareket_adi": exercise["hareket_adi"],
-                    "set_sayisi": exercise["set_sayisi"],
-                    "tekrar_sayisi": exercise["tekrar_sayisi"],
-                    "ekipman": exercise["ekipman"]
+                    "bolge": exercise.get("bolge", "Unknown"),
+                    "hareket_adi": exercise.get("hareket_adi", "Unknown"),
+                    "set_sayisi": exercise.get("set_sayisi", 0),
+                    "tekrar_sayisi": exercise.get("tekrar_sayisi", 0),
+                    "ekipman": exercise.get("ekipman", "None")
                 }
                 for exercise in exercises
             ]
@@ -122,14 +136,15 @@ def generate_workout_plan_for_user(user_id: int, user_data: UpdateUserData, db: 
             new_fitness_data = UserFitnessData(
                 user_id=user.id,
                 date=datetime.today(),
-                exercise_name=exercise["hareket_adi"],
+                exercise_name=exercise.get("hareket_adi", "Unknown"),
                 weight=0,  # Başlangıçta ağırlık verisi yoksa 0 olarak kaydedebiliriz
-                sets=exercise["set_sayisi"],
-                reps=exercise["tekrar_sayisi"]
+                sets=exercise.get("tekrar_sayisi", 0),
+                reps=exercise.get("ekipman", "None")
             )
             db.add(new_fitness_data)
+
     # Workout planını veritabanına kaydediyoruz
-    new_workout_plan = WorkoutPlan(user_id=user.id, workout_data=str(workout_plan))  # JSON formatında kaydediyoruz
+    new_workout_plan = WorkoutPlan(user_id=user.id, workout_data=json.dumps(workout_plan))  # JSON formatında kaydediyoruz
     db.add(new_workout_plan)
     db.commit()
     

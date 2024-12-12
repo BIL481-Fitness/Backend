@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
 from typing import List
 from datetime import date
+
 Base = declarative_base()
 
 class Coach(Base):
@@ -67,8 +68,7 @@ class Exercise(Base):
     reps = Column(Integer)
     equipment = Column(String)
 
-
-# Egzersizlerin modelini tanımlıyoruz
+# Pydantic models
 class ExerciseResponse(BaseModel):
     bolge: str  # Kas grubu
     hareket_adi: str  # Egzersiz adı
@@ -87,7 +87,7 @@ class UserFitnessDataResponse(BaseModel):
     reps: str
 
     class Config:
-        orm_mode = True  # ORM modelinden veri alabilmesini sağlıyor
+        from_attributes = True  # ORM modelinden veri alabilmesini sağlıyor
 
 class UpdateUserData(BaseModel):
     age: int
@@ -110,7 +110,6 @@ class StudentResponse(BaseModel):
     daily_calories: int
     goal: str
 
-
 class UserResponse(BaseModel):
     id: int
     name: str
@@ -124,7 +123,7 @@ class UserResponse(BaseModel):
     coach_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CoachResponse(BaseModel):
     id: int
@@ -136,7 +135,7 @@ class CoachResponse(BaseModel):
     experience_level: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CoachSelectionRequest(BaseModel):
     user_id: int
