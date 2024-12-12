@@ -248,3 +248,4 @@ def select_coach(request: CoachSelectionRequest, db: Session = Depends(get_db)):
     user.coach_id = request.coach_id
     db.commit()
     return {"message": "Coach selected successfully"}
+

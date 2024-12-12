@@ -82,3 +82,22 @@ def test_get_user_exercise_data_no_data():
     response = client.get("/user_fitness_data/1/exercise/NonexistentExercise")
     assert response.status_code == 404
     assert response.json() == {"detail": "No data found for the given user and exercise"}
+
+
+'''
+GET ALL COACHES
+'''
+def test_get_all_coaches():
+    response = client.get("/coaches")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)  # Ensure the response is a list
+    if response.json():  # If there are coaches in the response
+        coach = response.json()[0]
+        assert "id" in coach
+        assert "name" in coach
+        assert "specialization" in coach
+        assert "age" in coach
+        assert "weight" in coach
+        assert "height" in coach
+        assert "experience_level" in coach
+    
